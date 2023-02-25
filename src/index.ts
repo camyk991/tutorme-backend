@@ -36,6 +36,11 @@ app.get("/", (_, res) => {
 
 app.use(bodyParser.json()).use(bodyParser.urlencoded({ extended: true }));
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+
 // Handle register
 app.post(
   "/api/register",
