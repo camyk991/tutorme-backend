@@ -500,8 +500,8 @@ app.post("/api/addFriend", [
         ok: true,
     });
 }));
-app.listen(port, () => console.log(`Running on port http://localhost:${port}`));
-// app.listen(port, '192.168.1.24', () => console.log('dziala!'));
+// app.listen(port, () => console.log(`Running on port http://localhost:${port}`));
+app.listen(port, 'https://tutorme-backend.onrender.com/', () => console.log('dziala!'));
 // https.createServer(options, app).listen(8080, () => {
 //   console.log(`HTTPS server started on port 8080`);
 // });
