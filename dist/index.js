@@ -65,6 +65,9 @@ app.get("/", (_, res) => {
     res.status(200).send();
 });
 app.use(body_parser_1.default.json()).use(body_parser_1.default.urlencoded({ extended: true }));
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
 // Handle register
 app.post("/api/register", [
     (0, express_validator_1.check)("password")
@@ -500,8 +503,8 @@ app.post("/api/addFriend", [
         ok: true,
     });
 }));
-// app.listen(port, () => console.log(`Running on port http://localhost:${port}`));
-app.listen(port, 'https://tutorme-backend.onrender.com/', () => console.log('dziala!'));
+app.listen(port, () => console.log(`Running on port http://localhost:${port}`));
+// app.listen(port, 'https://tutorme-backend.onrender.com/', () => console.log('dziala!'));
 // https.createServer(options, app).listen(8080, () => {
 //   console.log(`HTTPS server started on port 8080`);
 // });
