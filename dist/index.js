@@ -58,16 +58,13 @@ const mongoose_1 = __importDefault(require("mongoose"));
 //   cert: fs.readFileSync("./config/cert.crt"),
 // };
 const app = (0, express_1.default)();
-const port = 5000;
+const port = 443;
 (0, db_1.default)();
 app.use((0, cors_1.default)());
 app.get("/", (_, res) => {
     res.status(200).send();
 });
 app.use(body_parser_1.default.json()).use(body_parser_1.default.urlencoded({ extended: true }));
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
 // Handle register
 app.post("/api/register", [
     (0, express_validator_1.check)("password")
