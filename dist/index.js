@@ -60,7 +60,12 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const app = (0, express_1.default)();
 const port = 5000;
 (0, db_1.default)();
-app.use((0, cors_1.default)());
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+    optionSuccessStatus: 200,
+};
+app.use((0, cors_1.default)(corsOptions));
 app.get("/", (_, res) => {
     res.status(200).send();
 });

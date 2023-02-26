@@ -28,7 +28,13 @@ const port = 5000;
 
 connectDB();
 
-app.use(cors());
+const corsOptions ={
+  origin:'*', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions));
 
 app.get("/", (_, res) => {
   res.status(200).send();
