@@ -24,7 +24,7 @@ import mongoose from "mongoose";
 // };
 
 const app = express();
-const port = 443;
+const port = process.env.PORT || 5000;
 
 connectDB();
 
