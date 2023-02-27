@@ -519,6 +519,8 @@ app.post(
     check("lessonUrl").trim().escape(),
   ],
   async (req: express.Request, res: express.Response) => {
+    const offer = await Offer.findOne({_id: req.body.offerId})
+
     const student = await User.updateOne(
       {
         email: req.body.studentMail,
@@ -532,6 +534,7 @@ app.post(
             lessonUrl: req.body.lessonUrl,
             points: req.body.points,
             completed: false,
+            title: offer.title
           },
         },
       }
@@ -550,6 +553,7 @@ app.post(
             lessonUrl: req.body.lessonUrl,
             points: req.body.points,
             completed: false,
+            title: offer.title
           },
         },
       }
@@ -575,7 +579,7 @@ app.post(
   "/api/getLessons",
   [check("mail").isEmail().trim().escape().normalizeEmail()],
   async (req: express.Request, res: express.Response) => {
-    const user = await User.find({
+    const user: any = await User.findOne({
       email: req.body.mail,
     });
 
@@ -583,9 +587,43 @@ app.post(
       return res.json({ ok: false, error: "Błąd pobierania lekcji" });
     }
 
+    let lessons: any = [];
+
+
+    try {
+
+      await Promise.all(await user.plannedLessons.map( async(el: any) => {
+        let object: any = {};
+  
+        object.completed = el.completed;
+        object.date = el.date;
+        object.lessonUrl = el.lessonUrl;
+        object.points = el.points;
+        object.title = el.title;
+  
+        if (el.studentMail == req.body.mail) {
+          const uInfo: any = await User.findOne({email: el.teacherMail})
+  
+          object.userName = uInfo.name;
+          object.userProfile = uInfo.profileImage;
+        } else {
+          const uInfo: any = await User.findOne({email: el.studentMail})
+  
+          object.userName = uInfo.name;
+          object.userProfile = uInfo.profileImage;
+        }
+
+        lessons.push(object);
+      }))
+    } catch(err) {
+      console.log(err);
+    }
+
+    console.log(lessons);
+
     return res.json({
       ok: true,
-      data: user,
+      data: lessons,
     });
   }
 );

@@ -413,6 +413,7 @@ app.post("/api/planLesson", [
     (0, express_validator_1.check)("offerId").trim().escape(),
     (0, express_validator_1.check)("lessonUrl").trim().escape(),
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const offer = yield offerModel_1.default.findOne({ _id: req.body.offerId });
     const student = yield userModel_1.default.updateOne({
         email: req.body.studentMail,
     }, {
@@ -424,6 +425,7 @@ app.post("/api/planLesson", [
                 lessonUrl: req.body.lessonUrl,
                 points: req.body.points,
                 completed: false,
+                title: offer.title
             },
         },
     });
@@ -438,6 +440,7 @@ app.post("/api/planLesson", [
                 lessonUrl: req.body.lessonUrl,
                 points: req.body.points,
                 completed: false,
+                title: offer.title
             },
         },
     });
@@ -453,15 +456,41 @@ app.post("/api/planLesson", [
     });
 }));
 app.post("/api/getLessons", [(0, express_validator_1.check)("mail").isEmail().trim().escape().normalizeEmail()], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield userModel_1.default.find({
+    const user = yield userModel_1.default.findOne({
         email: req.body.mail,
     });
     if (!user) {
         return res.json({ ok: false, error: "Błąd pobierania lekcji" });
     }
+    let lessons = [];
+    try {
+        yield Promise.all(yield user.plannedLessons.map((el) => __awaiter(void 0, void 0, void 0, function* () {
+            let object = {};
+            object.completed = el.completed;
+            object.date = el.date;
+            object.lessonUrl = el.lessonUrl;
+            object.points = el.points;
+            object.title = el.title;
+            if (el.studentMail == req.body.mail) {
+                const uInfo = yield userModel_1.default.findOne({ email: el.teacherMail });
+                object.userName = uInfo.name;
+                object.userProfile = uInfo.profileImage;
+            }
+            else {
+                const uInfo = yield userModel_1.default.findOne({ email: el.studentMail });
+                object.userName = uInfo.name;
+                object.userProfile = uInfo.profileImage;
+            }
+            lessons.push(object);
+        })));
+    }
+    catch (err) {
+        console.log(err);
+    }
+    console.log(lessons);
     return res.json({
         ok: true,
-        data: user,
+        data: lessons,
     });
 }));
 app.put("/api/updateCompletedLesson", [(0, express_validator_1.check)("email").isEmail().trim().escape().normalizeEmail()], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
