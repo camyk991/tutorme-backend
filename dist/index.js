@@ -61,7 +61,7 @@ const app = (0, express_1.default)();
 const port = 5000;
 (0, db_1.default)();
 const corsOptions = {
-    origin: '*',
+    origin: "*",
     credentials: true,
     optionSuccessStatus: 200,
 };
@@ -172,7 +172,11 @@ app.post("/api/getData", [(0, express_validator_1.check)("mail").isEmail().trim(
             try {
                 let friendUser = yield userModel_1.default.findById(el.id);
                 if (friendUser) {
-                    friends.push({ name: friendUser.name, avatar: friendUser.profileImage, id: friendUser._id });
+                    friends.push({
+                        name: friendUser.name,
+                        avatar: friendUser.profileImage,
+                        id: friendUser._id,
+                    });
                 }
             }
             catch (err) {
@@ -191,7 +195,7 @@ app.post("/api/getData", [(0, express_validator_1.check)("mail").isEmail().trim(
             profileImage: user.profileImage,
             theme: user.theme,
             points: user.points,
-            friends: friends
+            friends: friends,
         },
     });
 }));
@@ -425,7 +429,7 @@ app.post("/api/planLesson", [
                 lessonUrl: req.body.lessonUrl,
                 points: req.body.points,
                 completed: false,
-                title: offer.title
+                title: offer.title,
             },
         },
     });
@@ -440,7 +444,7 @@ app.post("/api/planLesson", [
                 lessonUrl: req.body.lessonUrl,
                 points: req.body.points,
                 completed: false,
-                title: offer.title
+                title: offer.title,
             },
         },
     });
@@ -471,6 +475,8 @@ app.post("/api/getLessons", [(0, express_validator_1.check)("mail").isEmail().tr
             object.lessonUrl = el.lessonUrl;
             object.points = el.points;
             object.title = el.title;
+            object.studentMail = el.studentMail;
+            object.teacherMail = el.teacherMail;
             if (el.studentMail == req.body.mail) {
                 const uInfo = yield userModel_1.default.findOne({ email: el.teacherMail });
                 object.userName = uInfo.name;
@@ -510,10 +516,7 @@ app.put("/api/updateCompletedLesson", [(0, express_validator_1.check)("email").i
         });
     }
 }));
-app.post("/api/addFriend", [
-    (0, express_validator_1.check)("inviterId").trim().escape(),
-    (0, express_validator_1.check)("friendId").trim().escape()
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/api/addFriend", [(0, express_validator_1.check)("inviterId").trim().escape(), (0, express_validator_1.check)("friendId").trim().escape()], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
