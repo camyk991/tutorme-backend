@@ -89,12 +89,12 @@ app.post("/api/register", [
         .withMessage("Znaki biały są niedozwolone"),
     (0, express_validator_1.check)("mail")
         .isEmail()
-        .escape()
         .trim()
         .normalizeEmail()
         .withMessage("Zły mail"),
     (0, express_validator_1.check)("name").trim().escape(),
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body.mail);
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         return res.json({ ok: false, errors: errors.array() });

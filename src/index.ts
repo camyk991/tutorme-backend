@@ -63,13 +63,14 @@ app.post(
       .withMessage("Znaki biały są niedozwolone"),
     check("mail")
       .isEmail()
-      .escape()
       .trim()
       .normalizeEmail()
       .withMessage("Zły mail"),
     check("name").trim().escape(),
   ],
   async (req: express.Request, res: express.Response) => {
+    console.log(req.body.mail)
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.json({ ok: false, errors: errors.array() });
