@@ -28,11 +28,11 @@ const port = 5000;
 
 connectDB();
 
-const corsOptions ={
-  origin:'*', 
-  credentials:true,            //access-control-allow-credentials:true
-  optionSuccessStatus:200,
-}
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
 
 app.use(cors(corsOptions));
 
@@ -170,21 +170,25 @@ app.post(
       process.env.JWT_SECRET
     );
 
-   let friends: any = [];
-if (user.friends && user.friends.length) {
-  await Promise.all(
-    user.friends.map(async (el) => {
-      try {
-        let friendUser = await User.findById(el.id);
-        if (friendUser) {
-          friends.push({ name: friendUser.name, avatar: friendUser.profileImage, id: friendUser._id });
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    })
-  );
-}
+    let friends: any = [];
+    if (user.friends && user.friends.length) {
+      await Promise.all(
+        user.friends.map(async (el) => {
+          try {
+            let friendUser = await User.findById(el.id);
+            if (friendUser) {
+              friends.push({
+                name: friendUser.name,
+                avatar: friendUser.profileImage,
+                id: friendUser._id,
+              });
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        })
+      );
+    }
 
     return res.json({
       ok: true,
@@ -197,7 +201,7 @@ if (user.friends && user.friends.length) {
         profileImage: user.profileImage,
         theme: user.theme,
         points: user.points,
-        friends: friends
+        friends: friends,
       },
     });
   }
@@ -520,7 +524,7 @@ app.post(
     check("lessonUrl").trim().escape(),
   ],
   async (req: express.Request, res: express.Response) => {
-    const offer = await Offer.findOne({_id: req.body.offerId})
+    const offer = await Offer.findOne({ _id: req.body.offerId });
 
     const student = await User.updateOne(
       {
@@ -535,7 +539,7 @@ app.post(
             lessonUrl: req.body.lessonUrl,
             points: req.body.points,
             completed: false,
-            title: offer.title
+            title: offer.title,
           },
         },
       }
@@ -554,7 +558,7 @@ app.post(
             lessonUrl: req.body.lessonUrl,
             points: req.body.points,
             completed: false,
-            title: offer.title
+            title: offer.title,
           },
         },
       }
@@ -590,33 +594,35 @@ app.post(
 
     let lessons: any = [];
 
-
     try {
+      await Promise.all(
+        await user.plannedLessons.map(async (el: any) => {
+          let object: any = {};
 
-      await Promise.all(await user.plannedLessons.map( async(el: any) => {
-        let object: any = {};
-  
-        object.completed = el.completed;
-        object.date = el.date;
-        object.lessonUrl = el.lessonUrl;
-        object.points = el.points;
-        object.title = el.title;
-  
-        if (el.studentMail == req.body.mail) {
-          const uInfo: any = await User.findOne({email: el.teacherMail})
-  
-          object.userName = uInfo.name;
-          object.userProfile = uInfo.profileImage;
-        } else {
-          const uInfo: any = await User.findOne({email: el.studentMail})
-  
-          object.userName = uInfo.name;
-          object.userProfile = uInfo.profileImage;
-        }
+          object.completed = el.completed;
+          object.date = el.date;
+          object.lessonUrl = el.lessonUrl;
+          object.points = el.points;
+          object.title = el.title;
+          object.studentMail = el.studentMail;
+          object.teacherMail = el.teacherMail;
 
-        lessons.push(object);
-      }))
-    } catch(err) {
+          if (el.studentMail == req.body.mail) {
+            const uInfo: any = await User.findOne({ email: el.teacherMail });
+
+            object.userName = uInfo.name;
+            object.userProfile = uInfo.profileImage;
+          } else {
+            const uInfo: any = await User.findOne({ email: el.studentMail });
+
+            object.userName = uInfo.name;
+            object.userProfile = uInfo.profileImage;
+          }
+
+          lessons.push(object);
+        })
+      );
+    } catch (err) {
       console.log(err);
     }
 
@@ -658,17 +664,14 @@ app.put(
 
 app.post(
   "/api/addFriend",
-  [
-    check("inviterId").trim().escape(),
-    check("friendId").trim().escape()
-  ],
+  [check("inviterId").trim().escape(), check("friendId").trim().escape()],
   async (req: express.Request, res: express.Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
       if (req.body.inviterId == req.body.friendId) {
-        throw new Error("Dodajesz sam siebie")
+        throw new Error("Dodajesz sam siebie");
       }
 
       const inviter = await User.updateOne(
@@ -676,7 +679,7 @@ app.post(
         { $addToSet: { friends: { id: req.body.friendId } } },
         { session }
       );
-  
+
       const friend = await User.updateOne(
         { _id: req.body.friendId },
         { $addToSet: { friends: { id: req.body.inviterId } } },
